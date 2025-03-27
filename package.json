@@ -1,0 +1,33 @@
+{
+  "name": "@xcrap/core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/*",
+    "!/**/__tests__"
+  ],
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": [
+    "xcrap",
+    "core",
+    "web scraping",
+    "node-html-parser",
+    "parsel",
+    "scrapy"
+  ],
+  "author": "Marcuth",
+  "license": "MIT",
+  "type": "commonjs",
+  "peerDependencies": {
+    "@xcrap/parser": "^0.0.2"
+  },
+  "devDependencies": {
+    "jmespath": "^0.16.0",
+    "node-html-parser": "^7.0.1"
+  }
+}
