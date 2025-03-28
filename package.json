@@ -27,7 +27,7 @@
   "author": "Marcuth",
   "license": "MIT",
   "type": "commonjs",
-  "dependencies": {
+  "peerDependencies": {
     "@xcrap/parser": "^0.0.2"
   },
   "devDependencies": {
