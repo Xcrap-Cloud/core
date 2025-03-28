@@ -117,7 +117,7 @@ const client = new HttpClient({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64;
 ```ts
 function randomUserAgent() {
     const userAgents = [
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 9_8_4; like Mac OS X) AppleWebKit/603.37 (KHTML, like Gecko) Chrome/54.0.1244.188 Mobile Safari/601.5", "Mozilla/5.0 (Windows NT 10.3;; en-US) AppleWebKit/537.35 (KHTML, like Gecko) Chrome/47.0.1707.185 Safari/601"
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 9_8_4; like Mac OS X) AppleWebKit/603.37 (KHTML, like Gecko) Chrome/54.0.1244.188 Mobile Safari/601.5", "Mozilla/5.0 (Windows NT 10.3;; en-US) AppleWebKit/537.35 (KHTML, like Gecko) Chrome/47.0.1707.185 Safari/601"
     ]
 
     const randomIndex = Math.floor(Math.random() * userAgents.length)
@@ -145,8 +145,8 @@ const client = new HttpClient({ proxyUrl: "https://my-proxy-app.my-username.work
 ```ts
 function randomProxyUrl() {
     const proxyUrls = [
-    "https://my-proxy-app.my-username-1.workers.dev",
-    "https://my-proxy-app.my-username-2.workers.dev"
+        "https://my-proxy-app.my-username-1.workers.dev",
+        "https://my-proxy-app.my-username-2.workers.dev"
     ]
 
     const randomIndex = Math.floor(Math.random() * proxyUrls.length)
