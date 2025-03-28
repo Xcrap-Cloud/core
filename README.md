@@ -34,41 +34,41 @@ type CustomClientOptions = BaseClientOptions<CustomClientProxy>
 type CustomClientFetchOptions = ClientFetchOptions & {}
 type CustomClientFetchManyOptions = ClientFetchManyOptions<CustomClientFetchOptions>
 
-class CustomClient extends BaseClient<CustomClientProxy> implements ClientInterface { 
-constructor(options: CustomClientOptions = {}) { 
-super(options) 
-} 
+class CustomClient extends BaseClient<CustomClientProxy> implements ClientInterface {
+    constructor(options: CustomClientOptions = {}) {
+        super(options)
+    }
 
-fetch({ 
-maxRetries = 0, 
-retries = 0, 
-retryDelay, 
-method = "GET",
-}): Promise<HttpResponse> {...} 
+    fetch({
+        maxRetries = 0,
+        retries = 0,
+        retryDelay,
+        method = "GET",
+    }): Promise<HttpResponse> {... }
 
-async fetchMany({ requests, concurrency, requestDelay }: CustomFetchManyOptions): Promise<HttpResponse[]> { 
-const results: HttpResponse[] = [] 
-const executing: Promise<void>[] = [] 
+    async fetchMany({ requests, concurrency, requestDelay }: CustomFetchManyOptions): Promise<HttpResponse[]> {
+        const results: HttpResponse[] = []
+        const executing: Promise<void>[] = []
 
-for (let i = 0; i < requests.length; i++) { 
-const promise = this.executeRequest({ 
-request: requests[i], 
-index: i, 
-requestDelay: requestDelay, 
-results: results 
-}).then(() => undefined)
+        for (let i = 0; i < requests.length; i++) {
+            const promise = this.executeRequest({
+                request: requests[i],
+                index: i,
+                requestDelay: requestDelay,
+                results: results
+            }).then(() => undefined)
 
-executing.push(promise)
+            executing.push(promise)
 
-if (this.shouldThrottle(executing, concurrency)) {
-await this.handleConcurrency(executing)
-}
-}
+            if (this.shouldThrottle(executing, concurrency)) {
+                await this.handleConcurrency(executing)
+            }
+        }
 
-await Promise.all(executing)
+        await Promise.all(executing)
 
-return results
-}
+        return results
+    }
 }
 ```
 
@@ -85,13 +85,13 @@ import { HttpClient } from "@xcrap/core"
 import { extract } from "@xcrap/parser"
 
 ;(async() => { 
-const client = new HttpClient() 
-const url = "https://example.com" 
-const response = await client.fetch({ url: url }) 
-const parser = response.asHtmlParser() 
-const pageTitle = await parser.parseFist({ query: "title", extractor: extract("innerText") }) 
+    const client = new HttpClient() 
+    const url = "https://example.com" 
+    const response = await client.fetch({ url: url }) 
+    const parser = response.asHtmlParser() 
+    const pageTitle = await parser.parseFist({ query: "title", extractor: extract("innerText") }) 
 
-console.log("Page Title:", pageTitle)
+    console.log("Page Title:", pageTitle)
 })();
 ```
 
@@ -102,29 +102,57 @@ In an HTTP client that extends from `BaseClient` we can add a proxy in the const
 ```ts
 ```
 
-#### Using a custom `User-Agent`
+#### Using a custom User Agent
 
 In a client that extends from `BaseClient` we can also customize the `User-Agent` of the requests. We can do this in two ways:
 
-1. **By providing a `User-Agent` string:
+1. **By providing a `userAgent` string:
 
 ```ts
 const client = new HttpClient({ userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" })
 ```
 
-2. **By providing a function that will generate a `User-Agent`:**
+2. **By providing a function that will generate a `userAgent`:**
 
 ```ts
 function randomUserAgent() {
-const userAgents = [
-"Mozilla/5.0 (iPhone; CPU iPhone OS 9_8_4; like Mac OS X) AppleWebKit/603.37 (KHTML, like Gecko) Chrome/54.0.1244.188 Mobile Safari/601.5", 
-"Mozilla/5.0 (Windows NT 10.3;; en-US) AppleWebKit/537.35 (KHTML, like Gecko) Chrome/47.0.1707.185 Safari/601" 
-] 
+    const userAgents = [
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 9_8_4; like Mac OS X) AppleWebKit/603.37 (KHTML, like Gecko) Chrome/54.0.1244.188 Mobile Safari/601.5", "Mozilla/5.0 (Windows NT 10.3;; en-US) AppleWebKit/537.35 (KHTML, like Gecko) Chrome/47.0.1707.185 Safari/601"
+    ]
 
-const randomIndex = Math.floor(Math.random() * userAgents.length) 
+    const randomIndex = Math.floor(Math.random() * userAgents.length)
 
-return userAgents[rnadomIndex]
+    return userAgents[randomIndex]
 }
 
 const client = new HttpClient({ userAgent: randomUserAgent })
+```
+
+#### Using custom Proxy URL
+
+In a client that extends `BaseClient` we can use proxy URLs, I don't know how to explain to you how they work, but I kind of discovered this kind of porxy when I was trying to solve the CORS problem by making a request on the client side, and then I met the *CORS Proxy*. Here I have a [template](https://gist.github.com/marcuth/9fbd321b011da44d1287faae31a8dd3a) for one for CloudFlare Workers in case you want to roll your own.
+
+Well, we can do it the same way we did with `userAgent`:
+
+1. **Providing a `proxyUrl` string:
+
+```ts
+const client = new HttpClient({ proxyUrl: "https://my-proxy-app.my-username.workers.dev" })
+```
+
+2. **Providing a function that will generate a `proxyUrl`:**
+
+```ts
+function randomProxyUrl() {
+    const proxyUrls = [
+    "https://my-proxy-app.my-username-1.workers.dev",
+    "https://my-proxy-app.my-username-2.workers.dev"
+    ]
+
+    const randomIndex = Math.floor(Math.random() * proxyUrls.length)
+
+    return proxyUrls[randomIndex]
+}
+
+const client = new HttpClient({ proxyUrl: randomProxyUrl })
 ```
