@@ -5,8 +5,9 @@ import http from "node:http"
 import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from "./interfaces"
 import { BaseClient, BaseClientOptions } from "./base-client"
 import { FaliedAttempt, HttpResponse } from "./http-response"
-import { delay } from "./utils/delay"
 import { InvalidStatusCodeError } from "./errors"
+import { defaultUserAgent } from "./constants"
+import { delay } from "./utils/delay"
 
 export type HttpClientProxy = string
 
@@ -46,7 +47,12 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                     
                     const lib = urlObject.protocol === "http:" ? http : https
 
-                    const request = lib.request(urlObject, options, (response) => {
+                    const request = lib.request(urlObject, {...options,
+                        headers: {
+                            ...options.headers,
+                            "user-agent": options.headers?.["user-agent"] ?? this.currentUserAgent ?? defaultUserAgent
+                        }
+                    }, (response) => {
                         let data = ""
 
                         if (response.statusCode && !this.isSuccess(response.statusCode)) {
