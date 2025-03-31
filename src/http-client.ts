@@ -6,6 +6,7 @@ import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from ".
 import { BaseClient, BaseClientOptions } from "./base-client"
 import { FaliedAttempt, HttpResponse } from "./http-response"
 import { delay } from "./utils/delay"
+import { InvalidStatusCodeError } from "./errors"
 
 export type HttpClientProxy = string
 
@@ -45,15 +46,19 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                     
                     const lib = urlObject.protocol === "http:" ? http : https
 
-                    const request = lib.request(urlObject, options, (res) => {
+                    const request = lib.request(urlObject, options, (response) => {
                         let data = ""
 
-                        if (followRedirects && [301, 302, 303, 307, 308].includes(res.statusCode!) && res.headers.location) {
+                        if (response.statusCode && !this.isSuccess(response.statusCode)) {
+                            throw new InvalidStatusCodeError(response.statusCode)
+                        }
+
+                        if (followRedirects && [301, 302, 303, 307, 308].includes(response.statusCode!) && response.headers.location) {
                             if (redirectCount >= 5) {
                                 return reject(new Error("Too many redirects"))
                             }
 
-                            const newUrl = new URL(res.headers.location, urlObject).href
+                            const newUrl = new URL(response.headers.location, urlObject).href
 
                             return resolve(
                                 this.fetch({
@@ -64,14 +69,14 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                             )
                         }
                         
-                        res.on("data", (chunk) => data += chunk)
+                        response.on("data", (chunk) => data += chunk)
         
-                        res.on("end", () => resolve(
+                        response.on("end", () => resolve(
                             new HttpResponse({
                                 body: data,
-                                headers: res.headers,
-                                status: res.statusCode || 200,
-                                statusText: res.statusMessage || "ok",
+                                headers: response.headers,
+                                status: response.statusCode || 200,
+                                statusText: response.statusMessage || "ok",
                                 attempts: currentRetry + 1,
                                 failedAttempts: failedAttempts,
                             })

@@ -27,8 +27,19 @@ You need to install `@xcrap/parser` as well because I left it as `peerDependency
 ### Creating a custom HTTP client
 
 ```ts
-import { BaseClient, ClientInterface, ClientFetchOptions, ClientFetchManyOptions, BaseClientOptions, HttpResponse, FaliedAttempt, ClientRequestOptions, InvalidStatusCodeError, defaultUserAgent } from "./src"
-import { delay } from "./src/utils/delay"
+import {
+    BaseClient,
+    ClientInterface,
+    ClientFetchOptions,
+    ClientFetchManyOptions,
+    BaseClientOptions,
+    HttpResponse,
+    FaliedAttempt,
+    ClientRequestOptions,
+    InvalidStatusCodeError,
+    defaultUserAgent, 
+    delay
+} from "@xcrap/core"
 
 type FetchClientProxy = string
 
