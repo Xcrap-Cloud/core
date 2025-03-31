@@ -19,6 +19,8 @@ export type ExecuteRequestOptions = {
     results: HttpResponse[]
 }
 
+
+
 export class BaseClient<Proxy> {
     public readonly proxy?: Proxy | ProxyFunction<Proxy>
     public readonly userAgent?: string | UserAgentFunction
@@ -50,7 +52,7 @@ export class BaseClient<Proxy> {
         return currentUserAgent
     }
 
-    protected get currentProxy(): any | undefined {
+    protected get currentProxy(): string | ReturnType<ProxyFunction<Proxy>> | undefined {
         const currentProxy = typeof this.proxy === "function" ?
             (this.proxy as ProxyFunction)() :
             this.proxy

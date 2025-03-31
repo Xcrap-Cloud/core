@@ -1,3 +1,4 @@
+import { HttpsProxyAgent } from "https-proxy-agent"
 import { URL } from "node:url"
 import https from "node:https"
 import http from "node:http"
@@ -45,13 +46,16 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                     const url = this.currentProxyUrl ? `${this.currentProxyUrl}${options.url}` : options.url
                     const urlObject = new URL(url)
                     
+                    const proxyAgent = this.currentProxy ? new HttpsProxyAgent(this.currentProxy) : undefined
                     const lib = urlObject.protocol === "http:" ? http : https
 
-                    const request = lib.request(urlObject, {...options,
+                    const request = lib.request(urlObject, {
+                        ...options,
                         headers: {
                             ...options.headers,
                             "user-agent": options.headers?.["user-agent"] ?? this.currentUserAgent ?? defaultUserAgent
-                        }
+                        },
+                        agent: proxyAgent
                     }, (response) => {
                         let data = ""
 
