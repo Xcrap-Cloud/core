@@ -45,5 +45,13 @@
   },
   "dependencies": {
     "https-proxy-agent": "^7.0.6"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xcrap-Cloud/core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Xcrap-Cloud/core/issues"
+  },
+  "homepage": "https://github.com/Xcrap-Cloud/core#readme"
 }
