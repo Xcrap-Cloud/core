@@ -31,7 +31,7 @@ module.exports = [
             entryFileNames: "[name].cjs",
             preserveModules: true,
         },
-        plugins: [resolve(), commonjs(), typescript()]
+        plugins: [resolve(), commonjs(), typescript({ noEmitHelpers: true })]
     },
     {
         input: inputFiles,
@@ -41,6 +41,6 @@ module.exports = [
             entryFileNames: "[name].mjs",
             preserveModules: true,
         },
-        plugins: [resolve(), commonjs(), typescript()]
+        plugins: [resolve(), commonjs(), typescript({ noEmitHelpers: true })]
     }
 ]
