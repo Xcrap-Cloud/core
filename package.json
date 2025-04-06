@@ -1,6 +1,6 @@
 {
   "name": "@xcrap/core",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Xcrap Core is the core package of the Xcrap framework for web scraping, offering tools such as HttpClient, BaseClient, Randomizer, Rotator, and support for proxies and pagination.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -41,7 +41,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "https-proxy-agent": "^7.0.6"
+    "https-proxy-agent": "^7.0.6",
+    "tslib": "^2.8.1"
   },
   "repository": {
     "type": "git",
