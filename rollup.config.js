@@ -1,6 +1,7 @@
 const typescript = require("@rollup/plugin-typescript")
 const resolve = require("@rollup/plugin-node-resolve")
-const commonjs =  require("@rollup/plugin-commonjs")
+const commonjs = require("@rollup/plugin-commonjs")
+const { dts } = require("rollup-plugin-dts")
 const path = require("node:path")
 const fs = require("node:fs")
 
@@ -30,8 +31,17 @@ module.exports = [
             format: "cjs",
             entryFileNames: "[name].cjs",
             preserveModules: true,
+            exports: "named",
         },
-        plugins: [resolve(), commonjs(), typescript()]
+        plugins: [
+            resolve(),
+            commonjs(),
+            typescript({
+                tsconfig: "./tsconfig.json",
+                declaration: false,
+                emitDeclarationOnly: false,
+            }),
+        ],
     },
     {
         input: inputFiles,
@@ -41,6 +51,24 @@ module.exports = [
             entryFileNames: "[name].mjs",
             preserveModules: true,
         },
-        plugins: [resolve(), commonjs(), typescript()]
+        plugins: [
+            resolve(),
+            commonjs(),
+            typescript({
+                tsconfig: "./tsconfig.json",
+                declaration: false,
+                emitDeclarationOnly: false,
+            }),
+        ],
+    },
+    {
+        input: inputFiles,
+        output: {
+            dir: "dist",
+            format: "es",
+            preserveModules: true,
+            entryFileNames: "[name].d.ts",
+        },
+        plugins: [dts()],
     }
 ]
