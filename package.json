@@ -10,7 +10,7 @@
     "!/**/__tests__"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "tsc",
     "test": "jest"
   },
   "keywords": [
