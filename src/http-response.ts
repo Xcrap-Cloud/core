@@ -69,7 +69,9 @@ export class HttpResponse {
         const contentType = this.getHeader("content-type") || ""
         if (!contentType.includes("application/json") && typeof this.body !== "object") {
             try {
-                return new JsonParser(JSON.parse(this.text()))
+                const validJson = JSON.parse(this.text())
+                const validJsonString = JSON.stringify(validJson)
+                return new JsonParser(validJsonString)
             } catch (e) {
                 throw new Error("Response body is not valid JSON")
             }
