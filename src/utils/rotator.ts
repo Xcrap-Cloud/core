@@ -1,9 +1,9 @@
 import { EmptyArrayError } from "../errors"
 
-export class Rotator {
+export class Rotator<T> {
     currentIndex = 0
 
-    constructor(readonly values: string[]) {
+    constructor(readonly values: T[]) {
         if (values.length === 0) {
             throw new EmptyArrayError(Rotator.name)
         }

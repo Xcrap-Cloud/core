@@ -1,7 +1,7 @@
 import { EmptyArrayError } from "../errors"
 
-export class Randomizer {
-    constructor(readonly values: string[]) {
+export class Randomizer<T> {
+    constructor(readonly values: T[]) {
         if (values.length === 0) {
             throw new EmptyArrayError(Randomizer.name)
         }
