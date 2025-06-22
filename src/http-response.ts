@@ -1,4 +1,6 @@
-import { HtmlParser, JsonParser } from "@xcrap/parser"
+import { HtmlParser, JsonParser, MarkdownParser } from "@xcrap/parser"
+
+import { InvalidHtmlBody, InvalidJsonBody, InvalidMarkdownBody } from "./errors"
 
 export type HttpResponseOptions = {
     status: number
@@ -49,7 +51,7 @@ export class HttpResponse {
         return this.headers[name.toLowerCase()]
     }
 
-    text(): string {
+    get text(): string {
         if (this.body === null || this.body === undefined) {
             return ""
         }
@@ -65,34 +67,48 @@ export class HttpResponse {
         return String(this.body)
     }
 
-    asJsonParser(): JsonParser {
+    asJsonParser(ignoreHeader: boolean = false): JsonParser {
         const contentType = this.getHeader("content-type") || ""
-        if (!contentType.includes("application/json") && typeof this.body !== "object") {
+        const isJsonHeader = contentType.includes("application/json")
+
+        if (!ignoreHeader && !isJsonHeader && typeof this.body !== "object") {
             try {
-                const validJson = JSON.parse(this.text())
+                const validJson = JSON.parse(this.text)
                 const validJsonString = JSON.stringify(validJson)
                 return new JsonParser(validJsonString)
             } catch (e) {
-                throw new Error("Response body is not valid JSON")
+                throw new InvalidJsonBody("Response body is not valid JSON")
             }
         }
 
         return new JsonParser(this.body)
     }
 
-    asParser<T>(constructor: new (body: any) => T): T {
-        return new constructor(this.body)
+    asMarkdownParser(ignoreHeader: boolean = false): MarkdownParser {
+        const contentType = this.getHeader("content-type") || ""
+        const isMarkdownHeader = contentType.includes("text/markdown") || contentType.includes("text/x-markdown")
+
+        if (!ignoreHeader && !isMarkdownHeader && typeof this.body !== "string") {
+            throw new InvalidMarkdownBody("Response body is not valid Markdown")
+        }
+
+        return new MarkdownParser(this.body)
     }
 
-    asHtmlParser(): HtmlParser {
+    asHtmlParser(ignoreHeader: boolean = false): HtmlParser {
         const contentType = this.getHeader("content-type") || ""
+        const isHtmlHeader = !contentType.includes("text/html")
 
-        if (!contentType.includes("text/html") && typeof this.body !== "string") {
-            throw new Error("Response body is not valid HTML")
+        if (!ignoreHeader && !isHtmlHeader && typeof this.body !== "string") {
+            throw new InvalidHtmlBody("Response body is not valid HTML")
         }
 
         return new HtmlParser(this.body)
     }
+
+    asParser<T>(constructor: new (body: any) => T): T {
+        return new constructor(this.body)
+    } 
 
     getFailedAttemptsCount(): number {
         return this.failedAttempts.length

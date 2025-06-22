@@ -18,9 +18,6 @@ export type ExecuteRequestOptions = {
     requestDelay?: number
     results: HttpResponse[]
 }
-
-
-
 export class BaseClient<Proxy> {
     public readonly proxy?: Proxy | ProxyFunction<Proxy>
     public readonly userAgent?: string | UserAgentFunction

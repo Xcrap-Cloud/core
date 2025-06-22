@@ -66,3 +66,24 @@ export class InvalidStatusCodeError extends Error {
         Object.setPrototypeOf(this, InvalidStatusCodeError.prototype)
     }
 }
+
+export class InvalidJsonBody extends Error {
+    constructor(message: string = "Invalid JSON body.") {
+        super(message)
+        this.name = "InvalidJsonBody"
+    }
+}
+
+export class InvalidHtmlBody extends Error {
+    constructor(message: string = "Invalid HTML body.") {
+        super(message)
+        this.name = "InvalidHtmlBody"
+    }
+}
+
+export class InvalidMarkdownBody extends Error {
+    constructor(message: string = "Invalid Markdown body.") {
+        super(message)
+        this.name = "InvalidMarkdownBody"
+    }
+}
