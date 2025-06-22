@@ -80,6 +80,10 @@ export class HttpResponse {
         return new JsonParser(this.body)
     }
 
+    asParser<T>(constructor: new (body: any) => T): T {
+        return new constructor(this.body)
+    }
+
     asHtmlParser(): HtmlParser {
         const contentType = this.getHeader("content-type") || ""
 
