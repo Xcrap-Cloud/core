@@ -3,12 +3,12 @@ import { URL } from "node:url"
 import https from "node:https"
 import http from "node:http"
 
-import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from "./interfaces"
+import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from "../interfaces"
 import { BaseClient, BaseClientOptions } from "./base-client"
-import { FaliedAttempt, HttpResponse } from "./http-response"
-import { InvalidStatusCodeError } from "./errors"
-import { defaultUserAgent } from "./constants"
-import { delay } from "./utils/delay"
+import { FaliedAttempt, HttpResponse } from "../http-response"
+import { InvalidStatusCodeError } from "../errors"
+import { defaultUserAgent } from "../constants"
+import { delay } from "../utils/delay"
 
 export type HttpClientProxy = string
 
@@ -29,7 +29,7 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
         super(options)
     }
 
-    fetch({
+    async fetch({
         maxRetries = 0,
         retries = 0,
         retryDelay,
@@ -45,7 +45,7 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                 return new Promise((resolve, reject) => {
                     const url = this.currentProxyUrl ? `${this.currentProxyUrl}${options.url}` : options.url
                     const urlObject = new URL(url)
-                    
+
                     const proxyAgent = this.currentProxy ? new HttpsProxyAgent(this.currentProxy) : undefined
                     const lib = urlObject.protocol === "http:" ? http : https
 
@@ -78,9 +78,9 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                                 })
                             )
                         }
-                        
+
                         response.on("data", (chunk) => data += chunk)
-        
+
                         response.on("end", () => resolve(
                             new HttpResponse({
                                 body: data,
@@ -92,9 +92,9 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                             })
                         ))
                     })
-        
+
                     request.on("error", reject)
-        
+
                     request.end()
                 })
             } catch (error: any) {
@@ -120,7 +120,7 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
             }
         }
 
-        return attemptRequest(retries)
+        return await attemptRequest(retries)
     }
 
     async fetchMany({ requests, concurrency, requestDelay }: HttpFetchManyOptions): Promise<HttpResponse[]> {

@@ -1,3 +1,4 @@
+import { css } from "@xcrap/extractor"
 import { ClientInterface, InvalidPageValueError, InvalidUrlError, PageOutOfRangeError, PageParsingFailureError, StaticPaginator, Tracker } from "../src"
 
 describe("StaticPaginator", () => {
@@ -94,7 +95,7 @@ describe("StaticPaginator.createWithTracking", () => {
 
     beforeEach(() => {
         mockParser = {
-            parseFirst: jest.fn(),
+            extractValue: jest.fn(),
         }
 
         mockResponse = {
@@ -105,12 +106,12 @@ describe("StaticPaginator.createWithTracking", () => {
 
         trackers = {
             currentPage: {
-                query: "currentPageSelector",
+                query: css("currentPageSelector"),
                 extractor: jest.fn(),
                 transformer: jest.fn().mockReturnValue(1),
             },
             lastPage: {
-                query: "lastPageSelector",
+                query: css("lastPageSelector"),
                 extractor: jest.fn(),
                 transformer: jest.fn().mockReturnValue(10),
             },
@@ -118,7 +119,7 @@ describe("StaticPaginator.createWithTracking", () => {
     })
 
     it("should create the paginator with the correct pages from tracking", async () => {
-        mockParser.parseFirst.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
+        mockParser.extractValue.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
 
         const { paginator } = await StaticPaginator.createWithTracking({
             client: mockClient,
@@ -134,7 +135,7 @@ describe("StaticPaginator.createWithTracking", () => {
     })
 
     it("should call the HTTP Client's fetch with the correct parameters", async () => {
-        mockParser.parseFirst.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
+        mockParser.extractValue.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
 
         await StaticPaginator.createWithTracking({
             client: mockClient,
@@ -147,7 +148,7 @@ describe("StaticPaginator.createWithTracking", () => {
     })
 
     it("should use the parser correctly to extract the pages", async () => {
-        mockParser.parseFirst.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
+        mockParser.extractValue.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
 
         const {} = await StaticPaginator.createWithTracking({
             client: mockClient,
@@ -156,8 +157,8 @@ describe("StaticPaginator.createWithTracking", () => {
             trackers: trackers,
         })
 
-        expect(mockParser.parseFirst).toHaveBeenCalledWith(trackers.currentPage)
-        expect(mockParser.parseFirst).toHaveBeenCalledWith(trackers.lastPage)
+        expect(mockParser.extractValue).toHaveBeenCalledWith(trackers.currentPage)
+        expect(mockParser.extractValue).toHaveBeenCalledWith(trackers.lastPage)
     })
 
     it("should throw an error if the Client fails to fetch the data", async () => {
@@ -178,7 +179,7 @@ describe("StaticPaginator.createWithTracking", () => {
         trackers.currentPage.transformer = currentPageTransformer
         trackers.lastPage.transformer = lastPageTransformer
 
-        mockParser.parseFirst.mockResolvedValueOnce("5").mockResolvedValueOnce("15")
+        mockParser.extractValue.mockResolvedValueOnce("5").mockResolvedValueOnce("15")
 
         const { paginator } = await StaticPaginator.createWithTracking({
             client: mockClient,
@@ -194,7 +195,7 @@ describe("StaticPaginator.createWithTracking", () => {
     })
 
     it("should throw an error if the trackers return undefined or null", async () => {
-        mockParser.parseFirst.mockResolvedValueOnce(undefined).mockResolvedValueOnce(null)
+        mockParser.extractValue.mockResolvedValueOnce(undefined).mockResolvedValueOnce(null)
     
         await expect(StaticPaginator.createWithTracking({
             client: mockClient,
@@ -205,7 +206,7 @@ describe("StaticPaginator.createWithTracking", () => {
     })
     
     it("should throw an error if the transformers return invalid values", async () => {
-        mockParser.parseFirst.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
+        mockParser.extractValue.mockResolvedValueOnce("1").mockResolvedValueOnce("10")
 
         const currentPageTransformer = jest.fn().mockReturnValue(undefined)
         const lastPageTransformer = jest.fn().mockReturnValue(undefined)

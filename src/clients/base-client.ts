@@ -1,6 +1,6 @@
-import { defaultUserAgent } from "./constants"
-import { HttpResponse } from "./http-response"
-import { delay } from "./utils/delay"
+import { defaultUserAgent } from "../constants"
+import { HttpResponse } from "../http-response"
+import { delay } from "../utils/delay"
 
 export type ProxyUrlFuction = () => string
 export type ProxyFunction<ProxyReturn = any> = () => ProxyReturn

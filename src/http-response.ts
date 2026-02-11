@@ -1,4 +1,4 @@
-import { HtmlParser, JsonParser, MarkdownParser } from "@xcrap/parser"
+import { HtmlParser, JsonParser, MarkdownParser } from "@xcrap/extractor"
 
 import { InvalidHtmlBody, InvalidJsonBody, InvalidMarkdownBody } from "./errors"
 
@@ -8,7 +8,10 @@ export type HttpResponseOptions = {
     body: any
     headers: Record<string, any>
     attempts?: number
-    failedAttempts?: Array<{ error: string; timestamp: Date }>
+    failedAttempts?: Array<{
+        error: string
+        timestamp: Date
+    }>
 }
 
 export type FaliedAttempt = {

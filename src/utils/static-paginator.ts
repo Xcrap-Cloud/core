@@ -1,4 +1,4 @@
-import { ExtractorFunction } from "@xcrap/parser"
+import { ExtractorFunction, BuildedQuery } from "@xcrap/extractor"
 
 import { InvalidPageValueError, InvalidUrlError, PageOutOfRangeError, PageParsingFailureError } from "../errors"
 import { ClientInterface, ClientRequestOptions } from "../interfaces/client"
@@ -14,7 +14,7 @@ export type StaticPaginatorOptions = {
 export type TrackerTransformer = (value: any) => number
 
 export type Tracker = {
-    query: string
+    query: BuildedQuery
     extractor: ExtractorFunction
     transformer?: TrackerTransformer
 }
@@ -59,8 +59,8 @@ export class StaticPaginator {
     }: StaticPaginatorCreateWithTracking) {
         const response = await client.fetch(request)
         const parser = response.asHtmlParser()
-        const currentPageRaw = await parser.parseFirst(trackers.currentPage)
-        const lastPageRaw = await parser.parseFirst(trackers.lastPage)
+        const currentPageRaw = await parser.extractValue(trackers.currentPage)
+        const lastPageRaw = await parser.extractValue(trackers.lastPage)
 
         if (!currentPageRaw || !lastPageRaw) {
             throw new PageParsingFailureError()
