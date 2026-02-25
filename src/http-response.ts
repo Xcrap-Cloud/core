@@ -27,14 +27,7 @@ export class HttpResponse {
     readonly attempts: number
     readonly failedAttempts: FaliedAttempt[]
 
-    constructor({
-        body,
-        status,
-        statusText,
-        headers = {},
-        attempts = 1,
-        failedAttempts = []
-    }: HttpResponseOptions) {
+    constructor({ body, status, statusText, headers = {}, attempts = 1, failedAttempts = [] }: HttpResponseOptions) {
         this.status = status
         this.statusText = statusText
         this.body = body
@@ -42,7 +35,7 @@ export class HttpResponse {
         this.failedAttempts = failedAttempts
 
         this.headers = Object.fromEntries(
-            Object.entries(headers).map(([key, value]) => [key.toLowerCase(), String(value)])
+            Object.entries(headers).map(([key, value]) => [key.toLowerCase(), String(value)]),
         )
     }
 
@@ -111,7 +104,7 @@ export class HttpResponse {
 
     asParser<T>(constructor: new (body: any) => T): T {
         return new constructor(this.body)
-    } 
+    }
 
     getFailedAttemptsCount(): number {
         return this.failedAttempts.length

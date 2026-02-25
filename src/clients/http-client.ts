@@ -1,11 +1,12 @@
 import { HttpsProxyAgent } from "https-proxy-agent"
-import { URL } from "node:url"
+
 import https from "node:https"
+import { URL } from "node:url"
 import http from "node:http"
 
 import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from "../interfaces"
-import { BaseClient, BaseClientOptions } from "./base-client"
 import { FaliedAttempt, HttpResponse } from "../http-response"
+import { BaseClient, BaseClientOptions } from "./base-client"
 import { InvalidStatusCodeError } from "../errors"
 import { defaultUserAgent } from "../constants"
 import { delay } from "../utils/delay"
@@ -14,11 +15,12 @@ export type HttpClientProxy = string
 
 export type HttpClientOptions = BaseClientOptions<HttpClientProxy> & {}
 
-export type HttpClientRequestOptions = http.RequestOptions & ClientRequestOptions & {
-    url: string
-    redirectCount?: number
-    followRedirects?: boolean
-}
+export type HttpClientRequestOptions = http.RequestOptions &
+    ClientRequestOptions & {
+        url: string
+        redirectCount?: number
+        followRedirects?: boolean
+    }
 
 export type HttpClientFetchOptions = HttpClientRequestOptions
 
@@ -49,49 +51,60 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                     const proxyAgent = this.currentProxy ? new HttpsProxyAgent(this.currentProxy) : undefined
                     const lib = urlObject.protocol === "http:" ? http : https
 
-                    const request = lib.request(urlObject, {
-                        ...options,
-                        headers: {
-                            ...options.headers,
-                            "user-agent": options.headers?.["user-agent"] ?? this.currentUserAgent ?? defaultUserAgent
+                    const request = lib.request(
+                        urlObject,
+                        {
+                            ...options,
+                            headers: {
+                                ...options.headers,
+                                "user-agent":
+                                    options.headers?.["user-agent"] ?? this.currentUserAgent ?? defaultUserAgent,
+                            },
+                            agent: proxyAgent,
                         },
-                        agent: proxyAgent
-                    }, (response) => {
-                        let data = ""
+                        (response) => {
+                            let data = ""
 
-                        if (response.statusCode && !this.isSuccess(response.statusCode)) {
-                            throw new InvalidStatusCodeError(response.statusCode)
-                        }
-
-                        if (followRedirects && [301, 302, 303, 307, 308].includes(response.statusCode!) && response.headers.location) {
-                            if (redirectCount >= 5) {
-                                return reject(new Error("Too many redirects"))
+                            if (response.statusCode && !this.isSuccess(response.statusCode)) {
+                                throw new InvalidStatusCodeError(response.statusCode)
                             }
 
-                            const newUrl = new URL(response.headers.location, urlObject).href
+                            if (
+                                followRedirects &&
+                                [301, 302, 303, 307, 308].includes(response.statusCode!) &&
+                                response.headers.location
+                            ) {
+                                if (redirectCount >= 5) {
+                                    return reject(new Error("Too many redirects"))
+                                }
 
-                            return resolve(
-                                this.fetch({
-                                    ...options,
-                                    url: newUrl,
-                                    redirectCount: redirectCount + 1
-                                })
+                                const newUrl = new URL(response.headers.location, urlObject).href
+
+                                return resolve(
+                                    this.fetch({
+                                        ...options,
+                                        url: newUrl,
+                                        redirectCount: redirectCount + 1,
+                                    }),
+                                )
+                            }
+
+                            response.on("data", (chunk) => (data += chunk))
+
+                            response.on("end", () =>
+                                resolve(
+                                    new HttpResponse({
+                                        body: data,
+                                        headers: response.headers,
+                                        status: response.statusCode || 200,
+                                        statusText: response.statusMessage || "ok",
+                                        attempts: currentRetry + 1,
+                                        failedAttempts: failedAttempts,
+                                    }),
+                                ),
                             )
-                        }
-
-                        response.on("data", (chunk) => data += chunk)
-
-                        response.on("end", () => resolve(
-                            new HttpResponse({
-                                body: data,
-                                headers: response.headers,
-                                status: response.statusCode || 200,
-                                statusText: response.statusMessage || "ok",
-                                attempts: currentRetry + 1,
-                                failedAttempts: failedAttempts,
-                            })
-                        ))
-                    })
+                        },
+                    )
 
                     request.on("error", reject)
 
@@ -132,7 +145,7 @@ export class HttpClient extends BaseClient<HttpClientProxy> implements ClientInt
                 request: requests[i],
                 index: i,
                 requestDelay: requestDelay,
-                results: results
+                results: results,
             }).then(() => undefined)
 
             executing.push(promise)

@@ -1,6 +1,6 @@
 import { ClientFetchManyOptions, ClientInterface, ClientRequestOptions } from "../interfaces"
-import { BaseClient, BaseClientOptions } from "./base-client"
 import { FaliedAttempt, HttpResponse } from "../http-response"
+import { BaseClient, BaseClientOptions } from "./base-client"
 import { InvalidStatusCodeError } from "../errors"
 import { defaultUserAgent } from "../constants"
 import { delay } from "../utils/delay"
@@ -9,9 +9,10 @@ export type FetchClientProxy = string
 
 export type FetchClientOptions = BaseClientOptions<FetchClientProxy> & {}
 
-export type FetchClientRequestOptions = RequestInit & ClientRequestOptions & {
-    url: string
-}
+export type FetchClientRequestOptions = RequestInit &
+    ClientRequestOptions & {
+        url: string
+    }
 
 export type FetchClientFetchOptions = FetchClientRequestOptions
 
@@ -40,7 +41,8 @@ export class FetchClient extends BaseClient<FetchClientProxy> implements ClientI
                     method: method,
                     headers: {
                         ...options.headers,
-                        "User-Agent": (options.headers as any)?.["User-Agent"] ?? this.currentUserAgent ?? defaultUserAgent,
+                        "User-Agent":
+                            (options.headers as any)?.["User-Agent"] ?? this.currentUserAgent ?? defaultUserAgent,
                     },
                 })
 
@@ -98,7 +100,7 @@ export class FetchClient extends BaseClient<FetchClientProxy> implements ClientI
                 request: requests[i],
                 index: i,
                 requestDelay: requestDelay,
-                results: results
+                results: results,
             }).then(() => undefined)
 
             executing.push(promise)

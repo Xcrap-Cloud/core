@@ -2,13 +2,13 @@ import { Randomizer, EmptyArrayError } from "../src"
 
 describe("Randomizer", () => {
     test("should throw an EmptyArrayError when initialized with an empty array", () => {
-        expect(() => new Randomizer([])).toThrow(EmptyArrayError);
-    });
+        expect(() => new Randomizer([])).toThrow(EmptyArrayError)
+    })
 
     test("should return an element from the provided array", () => {
         const values = ["A", "B", "C", "D"]
         const randomizer = new Randomizer(values)
-        
+
         const result = randomizer.random()
         expect(values).toContain(result)
     })

@@ -3,7 +3,6 @@ import { ExtractorFunction, BuildedQuery } from "@xcrap/extractor"
 import { InvalidPageValueError, InvalidUrlError, PageOutOfRangeError, PageParsingFailureError } from "../errors"
 import { ClientInterface, ClientRequestOptions } from "../interfaces/client"
 
-
 export type StaticPaginatorOptions = {
     initialPage: number
     lastPage: number
@@ -38,12 +37,7 @@ export class StaticPaginator {
     templateUrl: string
     minPage: number
 
-    constructor({
-        initialPage,
-        lastPage,
-        minPage,
-        templateUrl,
-    }: StaticPaginatorOptions) {
+    constructor({ initialPage, lastPage, minPage, templateUrl }: StaticPaginatorOptions) {
         this.initialPage = initialPage
         this.lastPage = lastPage
         this.currentPage = initialPage
@@ -51,12 +45,7 @@ export class StaticPaginator {
         this.minPage = minPage ?? initialPage
     }
 
-    static async createWithTracking({
-        client,
-        request,
-        templateUrl,
-        trackers
-    }: StaticPaginatorCreateWithTracking) {
+    static async createWithTracking({ client, request, templateUrl, trackers }: StaticPaginatorCreateWithTracking) {
         const response = await client.fetch(request)
         const parser = response.asHtmlParser()
         const currentPageRaw = await parser.extractValue(trackers.currentPage)
@@ -66,11 +55,11 @@ export class StaticPaginator {
             throw new PageParsingFailureError()
         }
 
-        const currentPageTransformed = trackers.currentPage.transformer 
+        const currentPageTransformed = trackers.currentPage.transformer
             ? trackers.currentPage.transformer(currentPageRaw)
             : Number(currentPageRaw)
 
-        const lastPageTransformed = trackers.lastPage.transformer 
+        const lastPageTransformed = trackers.lastPage.transformer
             ? trackers.lastPage.transformer(lastPageRaw)
             : Number(lastPageRaw)
 
@@ -84,8 +73,8 @@ export class StaticPaginator {
             paginator: new StaticPaginator({
                 initialPage: currentPageTransformed,
                 lastPage: lastPageTransformed,
-                templateUrl: templateUrl
-            })
+                templateUrl: templateUrl,
+            }),
         }
     }
 
@@ -134,14 +123,10 @@ export class StaticPaginator {
     dump(limit?: number): string[] {
         const urls: string[] = []
 
-        const maxUrls = limit !== undefined
-            ? Math.min(this.lastPage, this.currentPage + limit - 1)
-            : this.lastPage
+        const maxUrls = limit !== undefined ? Math.min(this.lastPage, this.currentPage + limit - 1) : this.lastPage
 
         for (let page = this.currentPage; page <= maxUrls; page++) {
-            urls.push(
-                StaticPaginator.generateUrl(this.templateUrl, page)
-            )
+            urls.push(StaticPaginator.generateUrl(this.templateUrl, page))
         }
 
         return urls

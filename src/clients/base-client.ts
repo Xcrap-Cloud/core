@@ -1,5 +1,5 @@
-import { defaultUserAgent } from "../constants"
 import { HttpResponse } from "../http-response"
+import { defaultUserAgent } from "../constants"
 import { delay } from "../utils/delay"
 
 export type ProxyUrlFuction = () => string
@@ -23,44 +23,31 @@ export class BaseClient<Proxy> {
     public readonly userAgent?: string | UserAgentFunction
     public readonly proxyUrl?: string | ProxyUrlFuction
 
-    public constructor({
-        proxy,
-        userAgent,
-        proxyUrl
-    }: BaseClientOptions<Proxy>) {
+    public constructor({ proxy, userAgent, proxyUrl }: BaseClientOptions<Proxy>) {
         this.proxy = proxy
         this.userAgent = userAgent ?? defaultUserAgent
         this.proxyUrl = proxyUrl
     }
 
     protected get currentProxyUrl(): string | undefined {
-        const currentProxyUrl = typeof this.proxyUrl === "function" ?
-            this.proxyUrl() :
-            this.proxyUrl
+        const currentProxyUrl = typeof this.proxyUrl === "function" ? this.proxyUrl() : this.proxyUrl
 
         return currentProxyUrl
     }
 
     protected get currentUserAgent(): string | undefined {
-        const currentUserAgent = typeof this.userAgent === "function" ?
-            this.userAgent() :
-            this.userAgent
+        const currentUserAgent = typeof this.userAgent === "function" ? this.userAgent() : this.userAgent
 
         return currentUserAgent
     }
 
     protected get currentProxy(): string | ReturnType<ProxyFunction<Proxy>> | undefined {
-        const currentProxy = typeof this.proxy === "function" ?
-            (this.proxy as ProxyFunction)() :
-            this.proxy
+        const currentProxy = typeof this.proxy === "function" ? (this.proxy as ProxyFunction)() : this.proxy
 
         return currentProxy
     }
 
-    protected shouldThrottle(
-        executing: Promise<void>[],
-        concurrency?: number
-    ): boolean {
+    protected shouldThrottle(executing: Promise<void>[], concurrency?: number): boolean {
         return concurrency !== undefined && executing.length >= concurrency
     }
 
@@ -75,12 +62,7 @@ export class BaseClient<Proxy> {
         this.cleanCompletedPromises(executing)
     }
 
-    protected async executeRequest({
-        index,
-        request,
-        results,
-        requestDelay
-    }: ExecuteRequestOptions): Promise<void> {
+    protected async executeRequest({ index, request, results, requestDelay }: ExecuteRequestOptions): Promise<void> {
         if (requestDelay !== undefined && requestDelay > 0 && index > 0) {
             await delay(requestDelay)
         }
