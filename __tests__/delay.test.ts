@@ -1,7 +1,7 @@
 import { delay } from "../src"
 
 describe("delay", () => {
-    it("should defind", () => {
+    it("should defined", () => {
         expect(delay).toBeDefined()
     })
 
