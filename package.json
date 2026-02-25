@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "format": "prettier --write \"src/**/*.ts\" \"__tests__**/*.ts\""
   },
   "keywords": [
